@@ -612,20 +612,70 @@
   }
 
   // ---------------------------------------------------------------------------
-  // Event Bindings
-  // ---------------------------------------------------------------------------
   function setupEventListeners() {
-    // 1. Navigation Menu Links & Mobile Toggle
-    $$(".nav-link").forEach((link) => {
-      link.addEventListener("click", (e) => {
-        $$(".nav-link").forEach((l) => l.classList.remove("active"));
+    // 1. Navigation Menu Links, Mobile Toggle, and Sticky Header Scroll Spy
+    const siteHeader = $(".site-header");
+    const sections = Array.from($$("main section[id]"));
+    const navLinks = Array.from($$(".nav-link"));
+
+    let isClickScrolling = false;
+    let clickScrollTimer = null;
+
+    navLinks.forEach((link) => {
+      link.addEventListener("click", () => {
+        isClickScrolling = true;
+        clearTimeout(clickScrollTimer);
+        navLinks.forEach((l) => l.classList.remove("active"));
         link.classList.add("active");
-        $("#navMenu").classList.remove("mobile-open");
+        $("#navMenu")?.classList.remove("mobile-open");
+        clickScrollTimer = setTimeout(() => {
+          isClickScrolling = false;
+        }, 800);
       });
     });
 
+    function handleScroll() {
+      const scrollPos = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+
+      // Header elevation shadow on scroll
+      if (siteHeader) {
+        if (scrollPos > 12) {
+          siteHeader.classList.add("scrolled");
+        } else {
+          siteHeader.classList.remove("scrolled");
+        }
+      }
+
+      // Dynamic nav pill update during mouse wheel scroll
+      if (!isClickScrolling && sections.length > 0) {
+        const viewportMarker = scrollPos + 120;
+        let activeSectionId = "hero";
+
+        for (const section of sections) {
+          const top = section.offsetTop;
+          const height = section.offsetHeight;
+          if (viewportMarker >= top && viewportMarker < top + height) {
+            activeSectionId = section.getAttribute("id");
+            break;
+          }
+        }
+
+        navLinks.forEach((link) => {
+          const href = link.getAttribute("href")?.replace("#", "");
+          if (href === activeSectionId) {
+            link.classList.add("active");
+          } else {
+            link.classList.remove("active");
+          }
+        });
+      }
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+
     $("#mobileMenuBtn")?.addEventListener("click", () => {
-      $("#navMenu").classList.toggle("mobile-open");
+      $("#navMenu")?.classList.toggle("mobile-open");
     });
 
     // 2. Hero Search Bar
