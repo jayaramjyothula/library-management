@@ -41,25 +41,67 @@ st.set_page_config(
 db.init_db()
 db.seed_sample_data()
 
-# Custom Modern CSS (Navy + Electric Blue Palette & Hover Effects)
+# Custom Modern CSS (Navy + Electric Blue Palette, High-Contrast Light Theme)
 st.markdown(
     """
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
 
-    html, body, [class*="css"] {
-        font-family: 'Inter', -apple-system, sans-serif;
-        color: #0f172a;
+    /* Global Light Theme Root Variables */
+    :root, .stApp {
+        --primary-color: #0284c7 !important;
+        --background-color: #f8fafc !important;
+        --secondary-background-color: #ffffff !important;
+        --text-color: #0f172a !important;
+    }
+
+    /* Base Page & App Canvas */
+    .stApp,
+    [data-testid="stAppViewContainer"],
+    [data-testid="stHeader"] {
+        background-color: #f8fafc !important;
+        color: #0f172a !important;
+        font-family: 'Inter', -apple-system, sans-serif !important;
     }
 
     #MainMenu, header, footer {
         visibility: hidden;
     }
 
-    .main .block-container {
-        padding-top: 1.5rem;
-        padding-bottom: 3rem;
-        max-width: 1200px;
+    .main .block-container,
+    [data-testid="block-container"] {
+        padding-top: 1.5rem !important;
+        padding-bottom: 3rem !important;
+        max-width: 1200px !important;
+    }
+
+    /* Universal Typography & High Contrast Text */
+    .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6,
+    [data-testid="stMarkdownContainer"] h1,
+    [data-testid="stMarkdownContainer"] h2,
+    [data-testid="stMarkdownContainer"] h3,
+    [data-testid="stMarkdownContainer"] h4,
+    [data-testid="stMarkdownContainer"] h5,
+    [data-testid="stMarkdownContainer"] h6 {
+        color: #0b132b !important;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        font-weight: 700 !important;
+    }
+
+    .stApp p, .stApp span, .stApp div, .stApp li,
+    [data-testid="stMarkdownContainer"] p,
+    [data-testid="stMarkdownContainer"] span,
+    [data-testid="stMarkdownContainer"] li {
+        color: #0f172a !important;
+    }
+
+    /* Subtext and Captions */
+    [data-testid="stCaptionContainer"],
+    .stCaption,
+    small,
+    [data-testid="stMarkdownContainer"] small {
+        color: #475569 !important;
+        font-weight: 500 !important;
     }
 
     /* Top Brand Bar */
@@ -68,8 +110,8 @@ st.markdown(
         align-items: center;
         justify-content: space-between;
         padding: 12px 24px;
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
         border-radius: 12px;
         box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
         margin-bottom: 24px;
@@ -89,7 +131,7 @@ st.markdown(
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #38bdf8;
+        color: #38bdf8 !important;
         font-size: 1.2rem;
     }
 
@@ -97,7 +139,7 @@ st.markdown(
         font-family: 'Plus Jakarta Sans', sans-serif;
         font-weight: 800;
         font-size: 1.2rem;
-        color: #0b132b;
+        color: #0b132b !important;
         letter-spacing: -0.02em;
     }
 
@@ -106,13 +148,13 @@ st.markdown(
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.06em;
-        color: #0284c7;
+        color: #0284c7 !important;
     }
 
     /* Hero Section */
     .hero-card {
-        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-        border: 1px solid #e2e8f0;
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+        border: 1px solid #e2e8f0 !important;
         border-radius: 16px;
         padding: 36px 32px;
         text-align: center;
@@ -125,7 +167,7 @@ st.markdown(
         font-family: 'Plus Jakarta Sans', sans-serif;
         font-size: 2.4rem;
         font-weight: 800;
-        color: #0b132b;
+        color: #0b132b !important;
         letter-spacing: -0.03em;
         margin-bottom: 8px;
     }
@@ -138,56 +180,205 @@ st.markdown(
 
     .hero-sub {
         font-size: 1.05rem;
-        color: #475569;
+        color: #475569 !important;
         max-width: 640px;
         margin: 0 auto 24px auto;
     }
 
     /* Metric Cards */
-    .stMetric {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 16px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        transition: all 0.2s ease;
+    [data-testid="stMetric"], .stMetric {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 12px !important;
+        padding: 16px 20px !important;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05) !important;
+        transition: all 0.2s ease !important;
     }
 
-    .stMetric:hover {
-        border-color: rgba(14, 165, 233, 0.4);
-        box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.08), 0 0 16px rgba(14, 165, 233, 0.15);
-        transform: translateY(-2px);
+    [data-testid="stMetric"]:hover, .stMetric:hover {
+        border-color: rgba(14, 165, 233, 0.5) !important;
+        box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.08), 0 0 16px rgba(14, 165, 233, 0.15) !important;
+        transform: translateY(-2px) !important;
+    }
+
+    [data-testid="stMetricLabel"],
+    [data-testid="stMetricLabel"] *,
+    .stMetric label {
+        color: #475569 !important;
+        font-weight: 600 !important;
+        font-size: 0.85rem !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.04em !important;
+    }
+
+    [data-testid="stMetricValue"],
+    [data-testid="stMetricValue"] *,
+    .stMetric [data-testid="stMetricValue"] {
+        color: #0b132b !important;
+        font-weight: 800 !important;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        font-size: 2rem !important;
+    }
+
+    /* Navigation Tabs */
+    [data-testid="stTabs"] [role="tablist"] {
+        gap: 8px;
+        border-bottom: 1px solid #e2e8f0 !important;
+    }
+
+    [data-testid="stTabs"] button,
+    .stTabs [role="tab"] {
+        color: #475569 !important;
+        background: transparent !important;
+        font-weight: 600 !important;
+        font-size: 0.95rem !important;
+        padding: 10px 18px !important;
+        border-radius: 8px 8px 0 0 !important;
+        border: none !important;
+        transition: all 0.2s ease !important;
+    }
+
+    [data-testid="stTabs"] button:hover,
+    .stTabs [role="tab"]:hover {
+        color: #0284c7 !important;
+        background: #f0f9ff !important;
+    }
+
+    [data-testid="stTabs"] button[aria-selected="true"],
+    .stTabs [role="tab"][aria-selected="true"] {
+        color: #0284c7 !important;
+        border-bottom: 3px solid #0284c7 !important;
+        font-weight: 700 !important;
+    }
+
+    /* Form Fields, Inputs & Labels */
+    label,
+    [data-testid="stWidgetLabel"],
+    [data-testid="stWidgetLabel"] *,
+    .stTextInput label,
+    .stSelectbox label,
+    .stNumberInput label,
+    .stDateInput label {
+        color: #1e293b !important;
+        font-weight: 600 !important;
+        font-size: 0.9rem !important;
+    }
+
+    [data-testid="stTextInput"] input,
+    [data-testid="stNumberInput"] input,
+    [data-testid="stDateInput"] input {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 8px !important;
+        padding: 10px 14px !important;
+    }
+
+    [data-testid="stTextInput"] input:focus,
+    [data-testid="stNumberInput"] input:focus,
+    [data-testid="stDateInput"] input:focus {
+        border-color: #0ea5e9 !important;
+        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2) !important;
+        outline: none !important;
+    }
+
+    /* Selectbox & Dropdowns */
+    div[data-baseweb="select"] {
+        background-color: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 8px !important;
+    }
+
+    div[data-baseweb="select"]:focus-within {
+        border-color: #0ea5e9 !important;
+        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2) !important;
+    }
+
+    div[data-baseweb="select"] * {
+        color: #0f172a !important;
+    }
+
+    div[data-baseweb="popover"] {
+        background-color: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 8px !important;
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.1) !important;
+    }
+
+    div[data-baseweb="popover"] * {
+        color: #0f172a !important;
+        background-color: transparent !important;
+    }
+
+    /* Expanders */
+    [data-testid="stExpander"] {
+        background-color: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 12px !important;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+        overflow: hidden !important;
+    }
+
+    [data-testid="stExpander"] summary,
+    [data-testid="stExpander"] summary * {
+        color: #0b132b !important;
+        font-weight: 600 !important;
+    }
+
+    /* Radio buttons & Checkboxes */
+    [data-testid="stRadio"] [role="radiogroup"] label *,
+    [data-testid="stCheckbox"] label * {
+        color: #1e293b !important;
+        font-weight: 500 !important;
+    }
+
+    /* Dataframes & Tables */
+    [data-testid="stDataFrame"],
+    [data-testid="stTable"] {
+        background-color: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 10px !important;
+    }
+
+    /* Alert Banners */
+    [data-testid="stAlert"] {
+        border-radius: 10px !important;
+    }
+
+    [data-testid="stAlert"] * {
+        color: #0f172a !important;
     }
 
     /* Buttons with Cyan Hover Glow */
     .stButton > button {
-        border-radius: 8px;
-        font-weight: 600;
-        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
 
     .stButton > button[kind="primary"] {
-        background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-        color: #ffffff;
-        border: 1px solid rgba(56, 189, 248, 0.4);
-        box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+        background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(56, 189, 248, 0.4) !important;
+        box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25) !important;
     }
 
     .stButton > button[kind="primary"]:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0 20px rgba(14, 165, 233, 0.45), 0 4px 12px rgba(2, 132, 199, 0.35);
-        border-color: #38bdf8;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 0 20px rgba(14, 165, 233, 0.45), 0 4px 12px rgba(2, 132, 199, 0.35) !important;
+        border-color: #38bdf8 !important;
+    }
+
+    .stButton > button[kind="secondary"] {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+        border: 1px solid #cbd5e1 !important;
     }
 
     .stButton > button[kind="secondary"]:hover {
-        border-color: #0ea5e9;
-        box-shadow: 0 0 12px rgba(14, 165, 233, 0.15);
-    }
-
-    /* Input Focus Glow */
-    .stTextInput input:focus, .stSelectbox [data-baseweb="select"]:focus-within {
         border-color: #0ea5e9 !important;
-        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2) !important;
+        color: #0284c7 !important;
+        box-shadow: 0 0 12px rgba(14, 165, 233, 0.15) !important;
     }
     </style>
     """,
@@ -401,7 +592,7 @@ with tab_circulation:
                                 st.rerun()
                             else:
                                 st.error(msg)
-                    st.markdown("<hr style='margin: 8px 0; border: none; border-top: 1px solid #f1f5f9;' />", unsafe_allow_html=True)
+                    st.markdown("<hr style='margin: 8px 0; border: none; border-top: 1px solid #e2e8f0;' />", unsafe_allow_html=True)
 
     elif circ_action == "Issue a Book":
         students = db.get_all_students()
