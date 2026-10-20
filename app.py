@@ -157,10 +157,15 @@ st.markdown(
         border: 1px solid #e2e8f0 !important;
         border-radius: 16px;
         padding: 36px 32px;
-        text-align: center;
+        text-align: center !important;
         margin-bottom: 28px;
         position: relative;
         box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
     }
 
     .hero-heading {
@@ -170,6 +175,8 @@ st.markdown(
         color: #0b132b !important;
         letter-spacing: -0.03em;
         margin-bottom: 8px;
+        text-align: center !important;
+        width: 100% !important;
     }
 
     .gradient-cyan {
@@ -181,8 +188,12 @@ st.markdown(
     .hero-sub {
         font-size: 1.05rem;
         color: #475569 !important;
-        max-width: 640px;
-        margin: 0 auto 24px auto;
+        max-width: 680px;
+        width: 100% !important;
+        margin: 8px auto 24px auto !important;
+        text-align: center !important;
+        display: block !important;
+        line-height: 1.6;
     }
 
     /* Metric Cards */
@@ -417,8 +428,8 @@ st.markdown(
         <div style="display:inline-block; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#0284c7; background:#f0f9ff; padding:4px 12px; border-radius:9999px; margin-bottom:12px; border:1px solid #bae6fd;">
             College Demonstration Edition
         </div>
-        <h1 class="hero-heading">Your Library, <span class="gradient-cyan">Simplified.</span></h1>
-        <p class="hero-sub">Explore the catalog, issue and return book copies instantly, and view student borrowing histories from one unified interface.</p>
+        <h1 class="hero-heading" style="text-align: center !important; margin-bottom: 8px !important;">Your Library, <span class="gradient-cyan">Simplified.</span></h1>
+        <p class="hero-sub" style="text-align: center !important; margin: 8px auto 24px auto !important; display: block !important; width: 100% !important; max-width: 680px !important;">Explore the catalog, issue and return book copies instantly, and view student borrowing histories from one unified interface.</p>
     </div>
     """,
     unsafe_allow_html=True,
