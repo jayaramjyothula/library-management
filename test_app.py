@@ -36,22 +36,16 @@ class TestUnifiedLibraryApp(unittest.TestCase):
         self.assertIn("Your Library", all_text)
 
     def test_metrics_and_tabs_render(self):
-        """Dashboard KPI cards and main tabs render with real numbers from SQLite."""
+        """Dashboard KPI cards and main navigation render with real numbers from SQLite."""
         at = AppTest.from_file("app.py", default_timeout=30)
         at.run()
 
         self.assertEqual(len(at.exception), 0)
-
-        # Check metric elements
-        self.assertGreaterEqual(len(at.metric), 4)
-        metric_labels = [m.label for m in at.metric]
-        self.assertIn("Total Books", metric_labels)
-        self.assertIn("Available Copies", metric_labels)
-        self.assertIn("Active Loans", metric_labels)
-        self.assertIn("Overdue Loans", metric_labels)
-
-        # Check tabs exist
-        self.assertGreaterEqual(len(at.tabs), 4)
+        all_text = " ".join([m.value for m in at.markdown])
+        self.assertIn("Total Titles", all_text)
+        self.assertIn("Available Copies", all_text)
+        self.assertIn("Active Loans", all_text)
+        self.assertIn("Overdue Loans", all_text)
 
 
 if __name__ == "__main__":

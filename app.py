@@ -11,6 +11,7 @@ from __future__ import annotations
 import io
 import math
 import sys
+import textwrap
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -44,6 +45,10 @@ st.set_page_config(
 db.init_db()
 db.seed_sample_data()
 
+# Helper to render clean HTML without leading markdown indentation
+def render_html(html_code: str):
+    st.markdown(textwrap.dedent(html_code).strip(), unsafe_allow_html=True)
+
 # Load External CSS Stylesheet + Streamlit Integration Rules
 css_path = Path(__file__).parent / "static" / "styles.css"
 custom_css = ""
@@ -51,7 +56,7 @@ if css_path.exists():
     with open(css_path, "r", encoding="utf-8") as f:
         custom_css = f.read()
 
-st.markdown(
+render_html(
     f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
@@ -70,64 +75,51 @@ st.markdown(
     }}
 
     .main .block-container, [data-testid="block-container"] {{
-        padding-top: 1rem !important;
+        padding-top: 1.2rem !important;
         padding-bottom: 3rem !important;
         max-width: 1240px !important;
     }}
 
-    /* Top Sticky Brand Navigation Bar */
-    .top-navbar-container {{
-        position: sticky;
-        top: 0;
-        z-index: 999;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid #e2e8f0;
-        border-radius: 14px;
-        padding: 10px 20px;
-        margin-bottom: 24px;
-        box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
+    /* Top Sticky Brand Navigation Bar Card */
+    div[data-testid="stVerticalBlockBorderWrapper"]:has(.brand-emblem-wrap) {{
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 14px !important;
+        padding: 8px 18px !important;
+        margin-bottom: 24px !important;
+        box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04) !important;
     }}
 
-    /* Navigation Radio Pills */
-    [data-testid="stRadio"] [role="radiogroup"] {{
+    /* Navigation Pills - No Radio Circles! */
+    [data-testid="stPills"] {{
         display: flex !important;
-        flex-direction: row !important;
-        align-items: center !important;
         justify-content: center !important;
+        align-items: center !important;
         gap: 6px !important;
-        background: transparent !important;
     }}
 
-    [data-testid="stRadio"] [role="radiogroup"] > label {{
-        padding: 8px 14px !important;
+    [data-testid="stPills"] button {{
         border-radius: 8px !important;
         font-size: 0.92rem !important;
         font-weight: 500 !important;
-        color: #475569 !important;
-        background: transparent !important;
+        padding: 8px 16px !important;
         border: none !important;
-        cursor: pointer !important;
+        background: transparent !important;
+        color: #475569 !important;
         transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }}
 
-    [data-testid="stRadio"] [role="radiogroup"] > label:hover {{
+    [data-testid="stPills"] button:hover {{
         color: #0b132b !important;
         background: #f1f5f9 !important;
     }}
 
-    [data-testid="stRadio"] [role="radiogroup"] > label[data-checked="true"],
-    [data-testid="stRadio"] [role="radiogroup"] > label:has(input:checked) {{
+    [data-testid="stPills"] button[aria-selected="true"],
+    [data-testid="stPills"] button[data-checked="true"] {{
         color: #0284c7 !important;
-        font-weight: 600 !important;
         background: #f0f9ff !important;
+        font-weight: 600 !important;
         box-shadow: inset 0 -2px 0 #0ea5e9 !important;
-    }}
-
-    [data-testid="stRadio"] [role="radiogroup"] input,
-    [data-testid="stRadio"] [role="radiogroup"] div[data-testid="stRadioCircle"] {{
-        display: none !important;
     }}
 
     /* Buttons */
@@ -242,8 +234,7 @@ st.markdown(
         border-bottom: 2px solid #e2e8f0;
     }}
     </style>
-    """,
-    unsafe_allow_html=True,
+    """
 )
 
 # -----------------------------------------------------------------------------
@@ -260,7 +251,7 @@ if "catalog_search" not in st.session_state:
 
 @st.dialog("Add New Book")
 def modal_add_book():
-    st.markdown("<p style='font-size:0.88rem; color:#64748b; margin-top:-8px; margin-bottom:16px;'>Enter the book details to add it to the campus catalogue.</p>", unsafe_allow_html=True)
+    render_html("<p style='font-size:0.88rem; color:#64748b; margin-top:-8px; margin-bottom:16px;'>Enter the book details to add it to the campus catalogue.</p>")
     with st.form("modal_form_add_book", clear_on_submit=False):
         b_title = st.text_input("Book Title *", placeholder="e.g. Introduction to Algorithms")
         b_author = st.text_input("Author(s) *", placeholder="e.g. Thomas H. Cormen")
@@ -301,7 +292,7 @@ def modal_add_book():
 
 @st.dialog("Issue a Book")
 def modal_issue_book():
-    st.markdown("<p style='font-size:0.88rem; color:#64748b; margin-top:-8px; margin-bottom:16px;'>Assign an available book copy to a registered student.</p>", unsafe_allow_html=True)
+    render_html("<p style='font-size:0.88rem; color:#64748b; margin-top:-8px; margin-bottom:16px;'>Assign an available book copy to a registered student.</p>")
     students = db.get_all_students()
     available_books = [b for b in db.get_all_books() if b["available_copies"] > 0]
     
@@ -350,7 +341,7 @@ def modal_issue_book():
 
 @st.dialog("Register Student")
 def modal_add_student():
-    st.markdown("<p style='font-size:0.88rem; color:#64748b; margin-top:-8px; margin-bottom:16px;'>Register a new student account to enable book checkout.</p>", unsafe_allow_html=True)
+    render_html("<p style='font-size:0.88rem; color:#64748b; margin-top:-8px; margin-bottom:16px;'>Register a new student account to enable book checkout.</p>")
     with st.form("modal_form_add_student", clear_on_submit=False):
         s_id = st.text_input("Student ID / Code *", placeholder="e.g. STU-2024-015")
         s_name = st.text_input("Full Name *", placeholder="e.g. Rahul Sharma")
@@ -379,32 +370,34 @@ def modal_add_student():
 
 @st.dialog("Borrowing History")
 def modal_student_history(student: Dict[str, Any]):
-    st.markdown(f"<h3 style='margin-top:-8px; color:#0b132b;'>{student['name']}</h3>", unsafe_allow_html=True)
+    render_html(f"<h3 style='margin-top:-8px; color:#0b132b;'>{student['name']}</h3>")
     st.caption(f"Student ID: {student['student_id']} • Email: {student['email']}")
     loans = db.get_loans(student_id_filter=student["id"])
     if not loans:
         st.info("No borrowing history found for this student.")
     else:
         for l in loans:
-            st.markdown(
+            is_ret = l.get("status") == "RETURNED"
+            bg_col = "#ecfdf5" if is_ret else "#f0f9ff"
+            txt_col = "#059669" if is_ret else "#0284c7"
+            render_html(
                 f"""
                 <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:12px 16px; margin-bottom:10px;">
                     <div style="font-weight:700; color:#0b132b;">{l['book_title']}</div>
                     <div style="font-size:0.82rem; color:#64748b;">Issued: {l['issue_date']} | Due: {l['due_date']}</div>
                     <div style="margin-top:6px;">
-                        <span style="font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:9999px; background:{'#ecfdf5' if l['status'] == 'RETURNED' else '#f0f9ff'}; color:{'#059669' if l['status'] == 'RETURNED' else '#0284c7'};">
+                        <span style="font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:9999px; background:{bg_col}; color:{txt_col};">
                             {l['status']}
                         </span>
                     </div>
                 </div>
-                """,
-                unsafe_allow_html=True,
+                """
             )
 
 
 @st.dialog("Edit Book")
 def modal_edit_book(book: Dict[str, Any]):
-    st.markdown(f"<p style='font-size:0.88rem; color:#64748b; margin-top:-8px;'>Update details for ID: #{book['id']}</p>", unsafe_allow_html=True)
+    render_html(f"<p style='font-size:0.88rem; color:#64748b; margin-top:-8px;'>Update details for ID: #{book['id']}</p>")
     with st.form(f"form_edit_book_{book['id']}"):
         new_title = st.text_input("Title", value=book["title"])
         new_author = st.text_input("Author", value=book["author"])
@@ -442,15 +435,14 @@ def modal_edit_book(book: Dict[str, Any]):
 # -----------------------------------------------------------------------------
 # Top Navigation Bar (Header) Matching Screenshot 1
 # -----------------------------------------------------------------------------
-with st.container():
-    st.markdown('<div class="top-navbar-container">', unsafe_allow_html=True)
-    col_brand, col_nav, col_actions = st.columns([2.8, 5.2, 2.4], vertical_alignment="center")
+with st.container(border=True):
+    col_brand, col_nav, col_actions = st.columns([2.6, 5.2, 2.6], vertical_alignment="center")
 
     with col_brand:
-        st.markdown(
+        render_html(
             """
-            <div style="display:flex; align-items:center; gap:12px;">
-                <div class="brand-emblem" style="width:38px; height:38px; background:linear-gradient(135deg, #0b132b 0%, #1e3a8a 100%); border-radius:8px; display:flex; align-items:center; justify-content:center; color:#38bdf8;">
+            <div class="brand-emblem-wrap" style="display:flex; align-items:center; gap:12px;">
+                <div class="brand-emblem" style="width:38px; height:38px; background:linear-gradient(135deg, #0b132b 0%, #1e3a8a 100%); border-radius:8px; display:flex; align-items:center; justify-content:center; color:#38bdf8; flex-shrink:0;">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
                         <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
@@ -463,23 +455,24 @@ with st.container():
                     <div style="font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#0284c7;">CAMPUS EDITION</div>
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
     with col_nav:
         pages = ["Overview", "Catalogue", "Circulation Desk", "Students", "Reports & Activity"]
-        current = st.session_state["current_page"]
-        selected = st.radio(
-            "nav_radio",
-            pages,
-            index=pages.index(current) if current in pages else 0,
-            horizontal=True,
-            label_visibility="collapsed",
-        )
-        if selected != st.session_state["current_page"]:
-            st.session_state["current_page"] = selected
-            st.rerun()
+        current = st.session_state.get("current_page", "Overview")
+        if hasattr(st, "pills"):
+            selected = st.pills("nav_pills", pages, default=current if current in pages else "Overview", label_visibility="collapsed")
+            if selected and selected != st.session_state["current_page"]:
+                st.session_state["current_page"] = selected
+                st.rerun()
+        else:
+            n_cols = st.columns(5)
+            for i, p in enumerate(pages):
+                is_active = (p == current)
+                if n_cols[i].button(p, key=f"nav_p_{i}", type="primary" if is_active else "secondary", use_container_width=True):
+                    st.session_state["current_page"] = p
+                    st.rerun()
 
     with col_actions:
         a1, a2 = st.columns([1, 1], vertical_alignment="center")
@@ -489,8 +482,6 @@ with st.container():
         with a2:
             if st.button("➕ Add Book", key="btn_top_add", type="primary", use_container_width=True):
                 modal_add_book()
-
-    st.markdown('</div>', unsafe_allow_html=True)
 
 
 # -----------------------------------------------------------------------------
@@ -504,10 +495,10 @@ if st.session_state["current_page"] == "Overview":
         else 0
     )
 
-    # Hero Badge & Title & Subtitle
-    st.markdown(
+    # Hero Badge & Title & Subtitle (No indentation)
+    render_html(
         """
-        <div style="text-align: center; padding: 24px 0 16px 0;">
+        <div style="text-align: center; padding: 20px 0 16px 0;">
             <div style="display:inline-flex; align-items:center; gap:8px; font-size:0.78rem; font-weight:700; color:#0284c7; background:#f0f9ff; padding:6px 16px; border-radius:9999px; margin-bottom:14px; border:1px solid #bae6fd;">
                 <span style="width:6px; height:6px; border-radius:50%; background:#0284c7; display:inline-block;"></span>
                 <span>Unified Library Management System • Demonstration Edition</span>
@@ -519,8 +510,7 @@ if st.session_state["current_page"] == "Overview":
                 Intelligent book cataloguing, instant book checkout and returns, live inventory tracking, and full student borrowing histories in one frictionless interface.
             </p>
         </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
 
     # Hero Search Bar (Screenshot 1)
@@ -540,7 +530,7 @@ if st.session_state["current_page"] == "Overview":
     # Quick Action Shortcuts (Screenshot 1)
     qa1, qa2, qa3, qa4, qa5 = st.columns([1.2, 1.5, 1.5, 1.5, 1.5], vertical_alignment="center")
     with qa1:
-        st.markdown("<div style='text-align:right; font-size:0.85rem; font-weight:600; color:#94a3b8; padding-right:6px;'>Quick Actions:</div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align:right; font-size:0.85rem; font-weight:600; color:#94a3b8; padding-top:6px;'>Quick Actions:</div>", unsafe_allow_html=True)
     with qa2:
         if st.button("📖 Browse Books", key="qa_browse", use_container_width=True):
             st.session_state["current_page"] = "Catalogue"
@@ -558,17 +548,6 @@ if st.session_state["current_page"] == "Overview":
 
     st.markdown("<div style='height: 32px;'></div>", unsafe_allow_html=True)
 
-    # Hidden semantic metrics/tabs container for automated test assertions
-    with st.container():
-        st.markdown("<div style='display:none !important; height:0px; overflow:hidden;'>", unsafe_allow_html=True)
-        sm1, sm2, sm3, sm4 = st.columns(4)
-        sm1.metric("Total Books", stats.get("total_books", 0))
-        sm2.metric("Available Copies", stats.get("available_copies", 0))
-        sm3.metric("Active Loans", stats.get("borrowed_copies", 0))
-        sm4.metric("Overdue Loans", stats.get("overdue_loans", 0))
-        st.tabs(["📚 Book Catalogue", "🔄 Circulation Desk", "👥 Student Records", "📊 Activity & Reports"])
-        st.markdown("</div>", unsafe_allow_html=True)
-
     # Real-Time Metric Cards (Screenshot 1)
     overdue_count = stats.get("overdue_loans", 0)
     overdue_badge = (
@@ -577,7 +556,7 @@ if st.session_state["current_page"] == "Overview":
         else '<span style="font-size:0.78rem; color:#94a3b8;">All loans in good standing</span>'
     )
 
-    st.markdown(
+    render_html(
         f"""
         <div class="metrics-grid">
             <div class="metric-card glow-card">
@@ -639,8 +618,7 @@ if st.session_state["current_page"] == "Overview":
                 <div style="margin-top:4px;">{overdue_badge}</div>
             </div>
         </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
 
 
@@ -654,15 +632,14 @@ elif st.session_state["current_page"] == "Circulation Desk":
     # Section Header
     sh_c1, sh_c2 = st.columns([4, 1.2], vertical_alignment="center")
     with sh_c1:
-        st.markdown(
+        render_html(
             """
             <div>
                 <div style="font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#0284c7; margin-bottom:4px;">CIRCULATION MANAGEMENT</div>
                 <h1 style="font-size:2.1rem; font-weight:800; color:#0b132b; margin:0 0 6px 0;">Circulation Desk</h1>
                 <p style="font-size:0.95rem; color:#475569; margin:0;">Manage active loans, process fast book returns, and issue books to registered students.</p>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
     with sh_c2:
         if st.button("📋 Issue Book", key="btn_circ_hdr_issue", type="primary", use_container_width=True):
@@ -694,18 +671,16 @@ elif st.session_state["current_page"] == "Circulation Desk":
             ]
 
         if not loans_to_show:
-            st.markdown(
+            render_html(
                 """
                 <div class="empty-state" style="padding:48px 20px; text-align:center; background:#ffffff; border:1px dashed #cbd5e1; border-radius:12px; margin-top:16px;">
                     <div style="font-size:1.15rem; font-weight:700; color:#0b132b; margin-bottom:6px;">No Active Borrowed Books</div>
                     <p style="font-size:0.9rem; color:#64748b; margin:0;">All issued books have been returned in full or match no active filter.</p>
                 </div>
-                """,
-                unsafe_allow_html=True,
+                """
             )
         else:
-            # Table Header Matching Screenshot 5
-            st.markdown(
+            render_html(
                 """
                 <div class="table-row table-head" style="margin-top:12px; border-radius:8px 8px 0 0;">
                     <div>BOOK DETAILS</div>
@@ -715,25 +690,24 @@ elif st.session_state["current_page"] == "Circulation Desk":
                     <div>STATUS</div>
                     <div style="text-align:right;">ACTION</div>
                 </div>
-                """,
-                unsafe_allow_html=True,
+                """
             )
 
             for l in loans_to_show:
                 r1, r2, r3, r4, r5, r6 = st.columns([3, 2, 1.4, 1.4, 1.4, 1.4], vertical_alignment="center")
                 with r1:
-                    st.markdown(f"**{l['book_title']}**<br><span style='font-size:0.8rem; color:#64748b;'>by {l['book_author']}</span>", unsafe_allow_html=True)
+                    render_html(f"<div><strong style='color:#0b132b;'>{l['book_title']}</strong><br><span style='font-size:0.8rem; color:#64748b;'>by {l['book_author']}</span></div>")
                 with r2:
-                    st.markdown(f"**{l['student_name']}**<br><span style='font-size:0.75rem; font-family:monospace; background:#f1f5f9; padding:2px 6px; border-radius:4px; color:#475569;'>{l['student_code']}</span>", unsafe_allow_html=True)
+                    render_html(f"<div><strong style='color:#0b132b;'>{l['student_name']}</strong><br><span style='font-size:0.75rem; font-family:monospace; background:#f1f5f9; padding:2px 6px; border-radius:4px; color:#475569;'>{l['student_code']}</span></div>")
                 with r3:
-                    st.markdown(f"<span style='font-size:0.88rem; color:#475569;'>{l['issue_date']}</span>", unsafe_allow_html=True)
+                    render_html(f"<span style='font-size:0.88rem; color:#475569;'>{l['issue_date']}</span>")
                 with r4:
-                    st.markdown(f"<span style='font-size:0.88rem; font-weight:700; color:#0b132b;'>{l['due_date']}</span>", unsafe_allow_html=True)
+                    render_html(f"<span style='font-size:0.88rem; font-weight:700; color:#0b132b;'>{l['due_date']}</span>")
                 with r5:
                     if l.get("is_overdue"):
-                        st.markdown(f"<span style='background:#fef2f2; color:#dc2626; font-size:0.75rem; font-weight:700; padding:4px 8px; border-radius:9999px;'>⚠️ Overdue ({l.get('days_overdue')}d)</span>", unsafe_allow_html=True)
+                        render_html(f"<span style='background:#fef2f2; color:#dc2626; font-size:0.75rem; font-weight:700; padding:4px 8px; border-radius:9999px;'>⚠️ Overdue ({l.get('days_overdue')}d)</span>")
                     else:
-                        st.markdown("<span style='background:#f0f9ff; color:#0284c7; font-size:0.75rem; font-weight:700; padding:4px 8px; border-radius:9999px;'>Active</span>", unsafe_allow_html=True)
+                        render_html("<span style='background:#f0f9ff; color:#0284c7; font-size:0.75rem; font-weight:700; padding:4px 8px; border-radius:9999px;'>Active</span>")
                 with r6:
                     if st.button("Return Book", key=f"ret_btn_{l['id']}", use_container_width=True):
                         ok, msg = db.return_book(l["id"], date.today().isoformat())
@@ -742,7 +716,7 @@ elif st.session_state["current_page"] == "Circulation Desk":
                             st.rerun()
                         else:
                             st.error(msg)
-                st.markdown("<hr style='margin:4px 0; border:none; border-top:1px solid #e2e8f0;'/>", unsafe_allow_html=True)
+                render_html("<hr style='margin:4px 0; border:none; border-top:1px solid #e2e8f0;'/>")
 
     with tab_overdue:
         if not overdue_loans:
@@ -751,11 +725,11 @@ elif st.session_state["current_page"] == "Circulation Desk":
             for l in overdue_loans:
                 ro1, ro2, ro3, ro4 = st.columns([3, 2, 2, 1.5], vertical_alignment="center")
                 with ro1:
-                    st.markdown(f"**{l['book_title']}**<br><span style='font-size:0.8rem; color:#64748b;'>by {l['book_author']}</span>", unsafe_allow_html=True)
+                    render_html(f"<div><strong style='color:#0b132b;'>{l['book_title']}</strong><br><span style='font-size:0.8rem; color:#64748b;'>by {l['book_author']}</span></div>")
                 with ro2:
-                    st.markdown(f"**{l['student_name']}** ({l['student_code']})<br><span style='font-size:0.8rem; color:#64748b;'>{l['student_email']}</span>", unsafe_allow_html=True)
+                    render_html(f"<div><strong style='color:#0b132b;'>{l['student_name']}</strong> ({l['student_code']})<br><span style='font-size:0.8rem; color:#64748b;'>{l['student_email']}</span></div>")
                 with ro3:
-                    st.markdown(f"<span style='color:#dc2626; font-weight:700;'>Due: {l['due_date']} ({l.get('days_overdue')} days overdue)</span>", unsafe_allow_html=True)
+                    render_html(f"<span style='color:#dc2626; font-weight:700;'>Due: {l['due_date']} ({l.get('days_overdue')} days overdue)</span>")
                 with ro4:
                     if st.button("Return Book", key=f"ret_overdue_{l['id']}", type="primary", use_container_width=True):
                         ok, msg = db.return_book(l["id"], date.today().isoformat())
@@ -764,7 +738,7 @@ elif st.session_state["current_page"] == "Circulation Desk":
                             st.rerun()
                         else:
                             st.error(msg)
-                st.markdown("<hr style='margin:4px 0; border:none; border-top:1px solid #e2e8f0;'/>", unsafe_allow_html=True)
+                render_html("<hr style='margin:4px 0; border:none; border-top:1px solid #e2e8f0;'/>")
 
     with tab_issue_form:
         students = db.get_all_students()
@@ -823,15 +797,14 @@ elif st.session_state["current_page"] == "Students":
     # Header Matching Screenshot 4
     sh_c1, sh_c2 = st.columns([4, 1.5], vertical_alignment="center")
     with sh_c1:
-        st.markdown(
+        render_html(
             """
             <div>
                 <div style="font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#0284c7; margin-bottom:4px;">STUDENT DIRECTORY</div>
                 <h1 style="font-size:2.1rem; font-weight:800; color:#0b132b; margin:0 0 6px 0;">Student Directory & Records</h1>
                 <p style="font-size:0.95rem; color:#475569; margin:0;">View registered students, track their active borrowing counts, and inspect borrowing histories.</p>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
     with sh_c2:
         if st.button("➕ Register Student", key="btn_hdr_reg_stu", type="primary", use_container_width=True):
@@ -844,15 +817,14 @@ elif st.session_state["current_page"] == "Students":
     with s_col1:
         q_stu = st.text_input("search_stu", placeholder="Search by student name, ID code, or email...", label_visibility="collapsed")
     with s_col2:
-        st.markdown(
+        render_html(
             f"""
             <div style="text-align:right;">
                 <span style="font-size:0.85rem; font-weight:600; color:#475569; background:#ffffff; border:1px solid #e2e8f0; padding:8px 16px; border-radius:9999px;">
                     {len(all_students)} registered students
                 </span>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
     st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
@@ -866,14 +838,13 @@ elif st.session_state["current_page"] == "Students":
         ]
 
     if not filtered_students:
-        st.markdown(
+        render_html(
             """
             <div class="empty-state" style="padding:48px 20px; text-align:center; background:#ffffff; border:1px dashed #cbd5e1; border-radius:12px;">
                 <div style="font-size:1.15rem; font-weight:700; color:#0b132b; margin-bottom:6px;">No Students Found</div>
                 <p style="font-size:0.9rem; color:#64748b; margin:0;">No students match the current search keyword.</p>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
     else:
         # 4-Column Student Cards Grid Matching Screenshot 4
@@ -882,7 +853,7 @@ elif st.session_state["current_page"] == "Students":
             with cols[idx % 4]:
                 name_parts = s["name"].split()
                 initials = (name_parts[0][0] + (name_parts[1][0] if len(name_parts) > 1 else "")).upper()
-                st.markdown(
+                render_html(
                     f"""
                     <div class="student-card glow-card" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:14px; padding:18px; margin-bottom:12px; box-shadow:0 1px 3px rgba(15,23,42,0.05); min-height:190px; display:flex; flex-direction:column;">
                         <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
@@ -900,8 +871,7 @@ elif st.session_state["current_page"] == "Students":
                             <span style="font-weight:700; color:#0284c7;">{s['active_loans_count']} books</span>
                         </div>
                     </div>
-                    """,
-                    unsafe_allow_html=True,
+                    """
                 )
                 if st.button("Borrowing History", key=f"btn_hist_{s['id']}", use_container_width=True):
                     modal_student_history(s)
@@ -917,15 +887,14 @@ elif st.session_state["current_page"] == "Reports & Activity":
     # Header Matching Screenshot 3
     rh_c1, rh_c2 = st.columns([4, 1.5], vertical_alignment="center")
     with rh_c1:
-        st.markdown(
+        render_html(
             """
             <div>
                 <div style="font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#0284c7; margin-bottom:4px;">ANALYTICS & AUDIT</div>
                 <h1 style="font-size:2.1rem; font-weight:800; color:#0b132b; margin:0 0 6px 0;">Activity & Reports</h1>
                 <p style="font-size:0.95rem; color:#475569; margin:0;">Export complete library logs and inspect real-time transaction activity.</p>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
     with rh_c2:
         if rep_data:
@@ -947,8 +916,30 @@ elif st.session_state["current_page"] == "Reports & Activity":
     dash_col1, dash_col2 = st.columns([1.6, 1], gap="large")
 
     with dash_col1:
-        st.markdown(
-            """
+        recent_items_html = ""
+        if not recent:
+            recent_items_html = "<p style='color:#64748b;'>No activity recorded yet.</p>"
+        else:
+            for r in recent:
+                is_ret = r.get("status") == "RETURNED"
+                dot_color = "#059669" if is_ret else "#0284c7"
+                action_text = "returned" if is_ret else "borrowed"
+                recent_items_html += f"""
+                <div style="display:flex; align-items:flex-start; gap:12px; margin-bottom:16px; padding-left:14px; position:relative; border-left:2px solid #e2e8f0;">
+                    <span style="position:absolute; left:-6px; top:4px; width:10px; height:10px; border-radius:50%; background:{dot_color};"></span>
+                    <div>
+                        <div style="font-size:0.9rem; color:#0f172a;">
+                            <strong>{r['student_name']}</strong> {action_text} <em>'{r['book_title']}'</em>
+                        </div>
+                        <div style="font-size:0.78rem; color:#94a3b8; margin-top:2px;">
+                            {r['created_at']} • Status: <span style="font-weight:600; color:{dot_color};">{r['status']}</span>
+                        </div>
+                    </div>
+                </div>
+                """
+
+        render_html(
+            f"""
             <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:14px; padding:24px; box-shadow:0 1px 3px rgba(15,23,42,0.05);">
                 <div style="display:flex; align-items:center; gap:8px; font-size:1.15rem; font-weight:700; color:#0b132b; margin-bottom:20px;">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -956,36 +947,13 @@ elif st.session_state["current_page"] == "Reports & Activity":
                     </svg>
                     <span>Recent Circulation Activity</span>
                 </div>
-            """,
-            unsafe_allow_html=True,
+                {recent_items_html}
+            </div>
+            """
         )
-        if not recent:
-            st.markdown("<p style='color:#64748b;'>No activity recorded yet.</p>", unsafe_allow_html=True)
-        else:
-            for r in recent:
-                is_ret = r.get("status") == "RETURNED"
-                dot_color = "#059669" if is_ret else "#0284c7"
-                action_text = "returned" if is_ret else "borrowed"
-                st.markdown(
-                    f"""
-                    <div style="display:flex; align-items:flex-start; gap:12px; margin-bottom:16px; padding-left:14px; position:relative; border-left:2px solid #e2e8f0;">
-                        <span style="position:absolute; left:-6px; top:4px; width:10px; height:10px; border-radius:50%; background:{dot_color};"></span>
-                        <div>
-                            <div style="font-size:0.9rem; color:#0f172a;">
-                                <strong>{r['student_name']}</strong> {action_text} <em>'{r['book_title']}'</em>
-                            </div>
-                            <div style="font-size:0.78rem; color:#94a3b8; margin-top:2px;">
-                                {r['created_at']} • Status: <span style="font-weight:600; color:{dot_color};">{r['status']}</span>
-                            </div>
-                        </div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
-        st.markdown("</div>", unsafe_allow_html=True)
 
     with dash_col2:
-        st.markdown(
+        render_html(
             """
             <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:14px; padding:24px; box-shadow:0 1px 3px rgba(15,23,42,0.05);">
                 <div style="display:flex; align-items:center; gap:8px; font-size:1.15rem; font-weight:700; color:#0b132b; margin-bottom:20px;">
@@ -1019,8 +987,7 @@ elif st.session_state["current_page"] == "Reports & Activity":
                     </div>
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
 
@@ -1030,15 +997,14 @@ elif st.session_state["current_page"] == "Reports & Activity":
 elif st.session_state["current_page"] == "Catalogue":
     cat_h1, cat_h2 = st.columns([4, 1.2], vertical_alignment="center")
     with cat_h1:
-        st.markdown(
+        render_html(
             """
             <div>
                 <div style="font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#0284c7; margin-bottom:4px;">BOOK CATALOGUE</div>
                 <h1 style="font-size:2.1rem; font-weight:800; color:#0b132b; margin:0 0 6px 0;">Book Catalogue & Inventory</h1>
                 <p style="font-size:0.95rem; color:#475569; margin:0;">Search, inspect copy availability, filter categories, or add new titles.</p>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
     with cat_h2:
         if st.button("➕ Add Book", key="btn_cat_add", type="primary", use_container_width=True):
@@ -1062,17 +1028,16 @@ elif st.session_state["current_page"] == "Catalogue":
     if sel_avail == "Checked Out":
         books = [b for b in books if b["available_copies"] == 0]
 
-    st.markdown(f"<p style='font-size:0.85rem; color:#64748b; margin-top:8px;'>Showing <strong>{len(books)}</strong> titles</p>", unsafe_allow_html=True)
+    render_html(f"<p style='font-size:0.85rem; color:#64748b; margin-top:8px;'>Showing <strong>{len(books)}</strong> titles</p>")
 
     if not books:
-        st.markdown(
+        render_html(
             """
             <div class="empty-state" style="padding:48px 20px; text-align:center; background:#ffffff; border:1px dashed #cbd5e1; border-radius:12px;">
                 <div style="font-size:1.15rem; font-weight:700; color:#0b132b; margin-bottom:6px;">No Books Found</div>
                 <p style="font-size:0.9rem; color:#64748b; margin:0;">Try adjusting your search criteria or category filter.</p>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
     else:
         # 3-Column Book Cards Grid
@@ -1082,7 +1047,7 @@ elif st.session_state["current_page"] == "Catalogue":
                 avail = b["available_copies"]
                 total = b["total_copies"]
                 pct = round((avail / total) * 100) if total > 0 else 0
-                st.markdown(
+                render_html(
                     f"""
                     <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:14px; padding:20px; margin-bottom:14px; box-shadow:0 1px 3px rgba(15,23,42,0.05); min-height:220px; display:flex; flex-direction:column;">
                         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
@@ -1104,8 +1069,7 @@ elif st.session_state["current_page"] == "Catalogue":
                             </div>
                         </div>
                     </div>
-                    """,
-                    unsafe_allow_html=True,
+                    """
                 )
                 bc1, bc2 = st.columns(2)
                 with bc1:
